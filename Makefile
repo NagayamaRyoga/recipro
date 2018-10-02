@@ -6,26 +6,30 @@ PANDOC       := pandoc
 PANDOC_FLAGS := --filter pandoc-crossref
 
 define DEF_DOCUMENT
-NAME   := $(patsubst ${SRC_DIR}/%/,%,$1)
-SRCS   := $(shell find $1 -type f)
-OBJS   := $${SRCS:%=${TEMP_DIR}/%}
 
-HTML   := ${DIST_DIR}/$${NAME}/index.html
-TEX    := ${TEMP_DIR}/$${NAME}/main.tex
+SRCS        := $(shell find ${SRC_DIR}/$1 -type f)
+OBJS        := $${SRCS:%=${TEMP_DIR}/%}
+OBJ_MDS     := $$(filter %.md,$${OBJS})
+OBJ_ASSETS  := $$(filter-out %.md,$${OBJS})
 
-all: $${NAME}
-html: $${NAME}-html
-tex: $${NAME}-tex
+HTML        := ${DIST_DIR}/$1/index.html
+HTML_ASSETS := $${OBJ_ASSETS:${TEMP_DIR}/${SRC_DIR}/%=${DIST_DIR}/%}
+TEX         := ${TEMP_DIR}/${SRC_DIR}/$1/main.tex
 
-$${NAME}: $${NAME}-html $${NAME}-tex
-$${NAME}-html: $${HTML}
-$${NAME}-tex: $${TEX}
+all: $1
+html: $1-html
+tex: $1-tex
 
-$${HTML}: $${OBJS}
-$${TEX}: $${OBJS}
+$1: $1-html $1-tex
+$1-html: $${HTML} $${HTML_ASSETS}
+$1-tex: $${TEX} $${OBJ_ASSETS}
+
+$${HTML}: $${OBJ_MDS}
+$${TEX}: $${OBJ_MDS}
+
 endef
 
-$(eval $(foreach dir,$(wildcard ${SRC_DIR}/*/),$(call DEF_DOCUMENT,${dir})))
+$(eval $(foreach dir,$(wildcard ${SRC_DIR}/*/),$(call DEF_DOCUMENT,${dir:${SRC_DIR}/%/=%})))
 
 .PHONY: all clean
 
@@ -42,8 +46,14 @@ ${TEMP_DIR}/${SRC_DIR}/%: ${SRC_DIR}/%
 	@mkdir -p $(dir $@)
 	cp $< $@
 
+${DIST_DIR}/%: ${TEMP_DIR}/${SRC_DIR}/%
+	@mkdir -p $(dir $@)
+	cp $< $@
+
 ${DIST_DIR}/%/index.html:
-	${PANDOC} ${PANDOC_FLAGS} -o $@ $(filter %.md,$^)
+	@mkdir -p $(dir $@)
+	${PANDOC} ${PANDOC_FLAGS} -o $@ $^
 
 ${TEMP_DIR}/%/main.tex:
-	${PANDOC} ${PANDOC_FLAGS} -o $@ $(filter %.md,$^)
+	@mkdir -p $(dir $@)
+	${PANDOC} ${PANDOC_FLAGS} -o $@ $^
