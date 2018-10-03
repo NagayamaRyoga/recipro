@@ -1,66 +1,92 @@
-TEMP_DIR          := .recipro
-DIST_DIR          := dist
-SRC_DIR           := src
-LAYOUTS_DIR       := layouts
-LAYOUTS_DIR_HTML  := ${LAYOUTS_DIR}/html
+-include config.mk
+-include layout.mk
 
-LAYOUT            := sample
+# default settings
+SRC_DIR         ?= src
+LAYOUT_DIR      ?= layouts
+LAYOUT_DIR_HTML ?= ${LAYOUT_DIR}/html
+TMP_DIR         ?= .recipro
+DIST_DIR        ?= dist
 
-PANDOC            := pandoc
-PANDOC_FLAGS      := --filter pandoc-crossref -s --toc
-PANDOC_FLAGS_HTML := -w html5 --template=${LAYOUTS_DIR_HTML}/${LAYOUT}.html --mathjax
+# default layouts
+LAYOUT_HTML        ?= default.html
+LAYOUT_HTML_ASSETS ?= default.css assets/default2.css
 
-define DEF_DOCUMENT
+# pandoc settings
+PANDOC ?= pandoc
 
-SRCS        := $(shell find ${SRC_DIR}/$1 -type f)
-OBJS        := $${SRCS:%=${TEMP_DIR}/%}
-OBJ_MDS     := $$(filter %.md,$${OBJS})
-OBJ_ASSETS  := $$(filter-out %.md,$${OBJS})
+PANDOC_FLAGS ?= \
+	--standalone \
+	--filter pandoc-crossref \
+	--table-of-contents
 
-HTML        := ${DIST_DIR}/$1/index.html
-HTML_ASSETS := $${OBJ_ASSETS:${TEMP_DIR}/${SRC_DIR}/%=${DIST_DIR}/%}
-TEX         := ${TEMP_DIR}/${SRC_DIR}/$1/main.tex
-PDF         := ${DIST_DIR}/$1.pdf
+PANDOC_HTML_FLAGS ?= \
+	${PANDOC_FLAGS} \
+	-w html5 \
+	--mathml \
+	--template=${LAYOUT_DIR_HTML}/${LAYOUT_HTML}
+
+PANDOC_TEX_FLAGS ?= \
+	${PANDOC_FLAGS}
+
+# enumerates subdirectories
+ARTICLES := $(patsubst ${SRC_DIR}/%/,%,$(filter %/,$(wildcard ${SRC_DIR}/*/)))
+
+.PHONY: all html pdf clean
+
+all:
+html:
+pdf:
+
+clean:
+	${RM} -r ${TMP_DIR} ${DIST_DIR}
+
+# expands targets
+define article_targets
+
+$1_FILES   := $(wildcard ${SRC_DIR}/$1/*)
+$1_SRCS    := $$(filter %.md,$${$1_FILES})
+$1_OBJS    := $${$1_SRCS:${SRC_DIR}/%=${TMP_DIR}/%}
+$1_ASSETS  := $$(shell find $$(filter-out %.md,$${$1_FILES}) -type f)
+$1_TASSETS := $${$1_ASSETS:${SRC_DIR}/%=${TMP_DIR}/%} $$(addprefix ${TMP_DIR}/$1/,${LAYOUT_HTML_ASSETS})
+$1_DASSETS := $${$1_TASSETS:${TMP_DIR}/%=${DIST_DIR}/%}
+
+.PHONY: $1 $1/html $1/pdf
 
 all: $1
-html: $1-html
-tex: $1-tex
+html: $1/html
+pdf: $1/pdf
 
-$1: $1-html $1-tex
-$1-html: $${HTML} $${HTML_ASSETS}
-$1-tex: $${PDF}
+$1: $1/html $1/pdf
+$1/html: ${DIST_DIR}/$1/index.html $${$1_DASSETS}
+$1/pdf: ${DIST_DIR}/$1.pdf
 
-$${HTML}: $${OBJ_MDS}
-$${PDF}: $${TEX} $${OBJ_ASSETS}
-$${TEX}: $${OBJ_MDS}
+${DIST_DIR}/$1/index.html: $${$1_OBJS}
+	@mkdir -p $$(dir $$@)
+	${PANDOC} ${PANDOC_HTML_FLAGS} $$(addprefix --css=,${LAYOUT_HTML_ASSETS}) -o $$@ $$^
+
+${DIST_DIR}/$1.pdf: ${TMP_DIR}/$1/main.tex $${$1_TASSETS}
+
+${TMP_DIR}/$1/main.tex: $${$1_OBJS}
+	@mkdir -p $$(dir $$@)
+	${PANDOC} ${PANDOC_TEX_FLAGS} -o $$@ $$^
+
+${TMP_DIR}/$1/%.md: ${SRC_DIR}/$1/%.md
+	@mkdir -p $$(dir $$@)
+	cp $$< $$@
+
+${TMP_DIR}/$1/%: ${SRC_DIR}/$1/%
+	@mkdir -p $$(dir $$@)
+	cp $$< $$@
+
+${TMP_DIR}/$1/%: ${LAYOUT_DIR_HTML}/%
+	@mkdir -p $$(dir $$@)
+	cp $$< $$@
+
+${DIST_DIR}/$1/%: ${TMP_DIR}/$1/%
+	@mkdir -p $$(dir $$@)
+	cp $$< $$@
 
 endef
 
-$(eval $(foreach dir,$(wildcard ${SRC_DIR}/*/),$(call DEF_DOCUMENT,${dir:${SRC_DIR}/%/=%})))
-
-.PHONY: all clean
-
-all:
-
-clean:
-	${RM} -r ${DIST_DIR} ${TEMP_DIR}
-
-${TEMP_DIR}/${SRC_DIR}/%.md: ${SRC_DIR}/%.md
-	@mkdir -p $(dir $@)
-	cp $< $@
-
-${TEMP_DIR}/${SRC_DIR}/%: ${SRC_DIR}/%
-	@mkdir -p $(dir $@)
-	cp $< $@
-
-${DIST_DIR}/%: ${TEMP_DIR}/${SRC_DIR}/%
-	@mkdir -p $(dir $@)
-	cp $< $@
-
-${DIST_DIR}/%/index.html:
-	@mkdir -p $(dir $@)
-	${PANDOC} ${PANDOC_FLAGS} ${PANDOC_FLAGS_HTML} -o $@ $^
-
-${TEMP_DIR}/%/main.tex:
-	@mkdir -p $(dir $@)
-	${PANDOC} ${PANDOC_FLAGS} ${PANDOC_FLAGS_TEX} -o $@ $^
+$(eval $(foreach article,${ARTICLES},$(call article_targets,${article})))
