@@ -7,8 +7,8 @@ LAYOUTS_DIR_HTML  := ${LAYOUTS_DIR}/html
 LAYOUT            := sample
 
 PANDOC            := pandoc
-PANDOC_FLAGS      := --filter pandoc-crossref -s
-PANDOC_FLAGS_HTML := -w html5 --template=${LAYOUTS_DIR_HTML}/${LAYOUT}.html
+PANDOC_FLAGS      := --filter pandoc-crossref -s --toc
+PANDOC_FLAGS_HTML := -w html5 --template=${LAYOUTS_DIR_HTML}/${LAYOUT}.html --mathjax
 
 define DEF_DOCUMENT
 

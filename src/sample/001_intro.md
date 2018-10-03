@@ -9,3 +9,7 @@
 [@fig:landscape]はあんまり関係ない画像。
 
 [@sec:intro]はここまで。
+
+$$ e = m c^2 $$ {#eq:einstein}
+
+[@eq:einstein]はあんまり関係ない数式。
