@@ -1,4 +1,5 @@
 html {
+    font-family: 'Libre Baskerville', serif;
     font-size: 16px;
 }
 
@@ -6,7 +7,53 @@ body {
 }
 
 header {
+    text-align: center;
 }
 
-main {
+article {
+    padding: 3rem;
+    text-indent: 1em;
+}
+
+.abstract {
+    padding: 1rem 3rem;
+}
+
+section.body {
+    counter-reset: chapter;
+}
+section h1 {
+    font-size: 1.2em;
+    counter-reset: sub-chapter;
+}
+section h2 {
+    font-size: 1.1em;
+    counter-reset: section;
+}
+section h3 {
+    font-size: 1.0em;
+}
+
+section h1::before {
+    counter-increment: chapter;
+    content: counter(chapter) ". ";
+}
+section h2::before {
+    counter-increment: sub-chapter;
+    content: counter(chapter) "." counter(sub-chapter) ". ";
+}
+section h3::before {
+    counter-increment: section;
+    content: counter(chapter) "." counter(sub-chapter) "." counter(section) ". ";
+}
+
+/* printing */
+@media print {
+    html {
+        font-size: 10.5px;
+    }
+}
+
+@page {
+    margin: 0mm;
 }

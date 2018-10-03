@@ -23,7 +23,7 @@ PANDOC_FLAGS ?= \
 PANDOC_HTML_FLAGS ?= \
 	${PANDOC_FLAGS} \
 	-w html5 \
-	--mathml \
+	--mathjax \
 	--template=${LAYOUT_DIR_HTML}/${LAYOUT_HTML}
 
 PANDOC_TEX_FLAGS ?= \
