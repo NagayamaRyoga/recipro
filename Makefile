@@ -73,6 +73,7 @@ ${TMP_DIR}/$1/main.tex: $${$1_OBJS}
 
 ${TMP_DIR}/$1/%.md: ${SRC_DIR}/$1/%.md
 	@mkdir -p $$(dir $$@)
+	@npm run lint $$<
 	cp $$< $$@
 
 ${TMP_DIR}/$1/%: ${SRC_DIR}/$1/%
