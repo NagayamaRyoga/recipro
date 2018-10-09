@@ -7,6 +7,7 @@ LAYOUT_DIR      ?= layouts
 LAYOUT_DIR_HTML ?= ${LAYOUT_DIR}/html
 TMP_DIR         ?= .recipro
 DIST_DIR        ?= dist
+TEXTLINT        ?= on
 
 # default layouts
 LAYOUT_HTML        ?= default.html
@@ -45,7 +46,7 @@ clean:
 define article_targets
 
 $1_FILES   := $(wildcard ${SRC_DIR}/$1/*)
-$1_SRCS    := $$(filter %.md,$${$1_FILES})
+$1_SRCS    := $$(sort $$(filter %.md,$${$1_FILES}))
 $1_OBJS    := $${$1_SRCS:${SRC_DIR}/%=${TMP_DIR}/%}
 $1_ASSETS  := $$(shell find $$(filter-out %.md,$${$1_FILES}) -type f)
 $1_TASSETS := $${$1_ASSETS:${SRC_DIR}/%=${TMP_DIR}/%} $$(addprefix ${TMP_DIR}/$1/,${LAYOUT_HTML_ASSETS})
@@ -73,7 +74,9 @@ ${TMP_DIR}/$1/main.tex: $${$1_OBJS}
 
 ${TMP_DIR}/$1/%.md: ${SRC_DIR}/$1/%.md
 	@mkdir -p $$(dir $$@)
-	@npm run lint $$<
+	@if [ "$${TEXTLINT}" = "on" ]; then \
+		npm run lint $$<; \
+	fi
 	cp $$< $$@
 
 ${TMP_DIR}/$1/%: ${SRC_DIR}/$1/%
