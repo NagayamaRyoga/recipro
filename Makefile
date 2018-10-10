@@ -10,7 +10,7 @@ DIST_DIR        ?= dist
 
 # default layouts
 LAYOUT_HTML        ?= default.html
-LAYOUT_HTML_ASSETS ?= default.css
+LAYOUT_HTML_ASSETS ?= assets/style/article.css
 
 # pandoc settings
 PANDOC ?= pandoc
@@ -72,7 +72,7 @@ $1/pdf: ${DIST_DIR}/$1.pdf
 
 ${DIST_DIR}/$1/index.html: $${$1_OBJS}
 	@mkdir -p $$(dir $$@)
-	${PANDOC} ${PANDOC_HTML_FLAGS} $$(addprefix --css=,${LAYOUT_HTML_ASSETS}) -o $$@ $$^
+	${PANDOC} ${PANDOC_HTML_FLAGS} -o $$@ $$^
 
 ${DIST_DIR}/$1.pdf: ${TMP_DIR}/$1/main.tex $${$1_TASSETS}
 
