@@ -1,5 +1,5 @@
--include config.mk
--include layout.mk
+-include config/config.mk
+-include config/layout.mk
 
 # default settings
 SRC_DIR         ?= src
@@ -7,7 +7,6 @@ LAYOUT_DIR      ?= layouts
 LAYOUT_DIR_HTML ?= ${LAYOUT_DIR}/html
 TMP_DIR         ?= .recipro
 DIST_DIR        ?= dist
-TEXTLINT        ?= on
 
 # default layouts
 LAYOUT_HTML        ?= default.html
@@ -19,6 +18,7 @@ PANDOC ?= pandoc
 PANDOC_FLAGS ?= \
 	--standalone \
 	--filter pandoc-crossref \
+	-M crossrefYaml=config/crossref.yml \
 	--table-of-contents
 
 PANDOC_HTML_FLAGS ?= \
@@ -29,6 +29,11 @@ PANDOC_HTML_FLAGS ?= \
 
 PANDOC_TEX_FLAGS ?= \
 	${PANDOC_FLAGS}
+
+# textlint settings
+TEXTLINT ?= npm run lint
+
+TEXTLINT_FLAGS ?=
 
 # enumerates subdirectories
 ARTICLES := $(patsubst ${SRC_DIR}/%/,%,$(filter %/,$(wildcard ${SRC_DIR}/*/)))
@@ -77,8 +82,8 @@ ${TMP_DIR}/$1/main.tex: $${$1_OBJS}
 
 ${TMP_DIR}/$1/%.md: ${SRC_DIR}/$1/%.md
 	@mkdir -p $$(dir $$@)
-	@if [ "$${TEXTLINT}" = "on" ]; then \
-		npm run lint $$<; \
+	@if [ -n "$${TEXTLINT}" ]; then \
+		$${TEXTLINT} $$<; \
 	fi
 	cp $$< $$@
 
