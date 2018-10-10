@@ -11,7 +11,7 @@ TEXTLINT        ?= on
 
 # default layouts
 LAYOUT_HTML        ?= default.html
-LAYOUT_HTML_ASSETS ?= default.css assets/default2.css
+LAYOUT_HTML_ASSETS ?= default.css
 
 # pandoc settings
 PANDOC ?= pandoc
@@ -36,6 +36,7 @@ ARTICLES := $(patsubst ${SRC_DIR}/%/,%,$(filter %/,$(wildcard ${SRC_DIR}/*/)))
 .PHONY: all html pdf clean
 
 all:
+lint:
 html:
 pdf:
 
@@ -52,13 +53,15 @@ $1_ASSETS  := $$(shell find $$(filter-out %.md,$${$1_FILES}) -type f)
 $1_TASSETS := $${$1_ASSETS:${SRC_DIR}/%=${TMP_DIR}/%} $$(addprefix ${TMP_DIR}/$1/,${LAYOUT_HTML_ASSETS})
 $1_DASSETS := $${$1_TASSETS:${TMP_DIR}/%=${DIST_DIR}/%}
 
-.PHONY: $1 $1/html $1/pdf
+.PHONY: $1 $1/lint $1/html $1/pdf
 
 all: $1
+lint: $1/lint
 html: $1/html
 pdf: $1/pdf
 
 $1: $1/html $1/pdf
+$1/lint: $${$1_OBJS}
 $1/html: ${DIST_DIR}/$1/index.html $${$1_DASSETS}
 $1/pdf: ${DIST_DIR}/$1.pdf
 
