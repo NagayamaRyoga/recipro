@@ -18,6 +18,15 @@ p {
     text-indent: 1em;
 }
 
+code {
+    font-family: 'consolas', monospace;
+    background-color: #f2f2f2;
+    margin-inline-start: 0.1em;
+    margin-inline-end: 0.1em;
+    padding-inline-start: 0.3em;
+    padding-inline-end: 0.3em;
+}
+
 .abstract {
     padding: 1rem 3rem;
 }
