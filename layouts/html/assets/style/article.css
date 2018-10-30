@@ -14,13 +14,21 @@ article {
     padding: 3rem;
 }
 
+blockquote {
+    padding: 0.2em;
+    padding-left: 1em;
+    border-left: solid 3px #000000;
+}
+
 p {
     text-indent: 1em;
 }
 
+pre {
+    background-color: #f2f2f2;
+}
 code {
     font-family: 'consolas', monospace;
-    background-color: #f2f2f2;
     margin-inline-start: 0.1em;
     margin-inline-end: 0.1em;
     padding-inline-start: 0.3em;
