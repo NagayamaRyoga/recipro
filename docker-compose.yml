@@ -1,0 +1,12 @@
+version: '2'
+services:
+  builder:
+    volumes:
+      - .:/recipro
+    working_dir: /recipro
+    build: docker/builder
+  linter:
+    volumes:
+      - .:/recipro
+    working_dir: /recipro
+    build: docker/linter

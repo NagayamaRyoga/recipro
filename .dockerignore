@@ -1,3 +1,5 @@
-/node_modules/
-/.recipro/
-/dist/
+node_modules/
+.vscode/
+
+*.pdf
+obj/

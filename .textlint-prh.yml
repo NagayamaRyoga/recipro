@@ -1,0 +1,13 @@
+version: 1
+rules:
+  - expected: ユーザ
+    patterns:
+      - ユーザー
+
+  - expected: ディジタル
+    patterns:
+      - デジタル
+
+  - expected: メモリ
+    patterns:
+      - メモリー

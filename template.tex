@@ -1,0 +1,97 @@
+\documentclass[a4j,12pt,twoside]{jreport}
+\usepackage{graphicx}
+\usepackage{csvsimple}
+\usepackage{fancyvrb}
+\usepackage[dvipdfmx]{hyperref}
+\usepackage{kit-is-b}
+
+% \csvtable{caption}{label}{filepath}
+\makeatletter
+\csvset{
+	csv_table/.style={
+		after head=\csv@pretable \begin{tabular}{|*{\csv@columncount}{c|}} \csv@tablehead,
+		table head=\hline \csvlinetotablerow \\ \hline \hline,
+		late after line=\\,
+		late after last line=\csv@tablefoot \end{tabular} \csv@posttable,
+	}
+}
+\makeatother
+
+\newcommand{\csvtable}[3]{
+	\begin{table}[p]
+		\begin{center}
+			\caption{#1}
+			\label{#2}
+			\csvautotabular[csv_table]{#3}
+		\end{center}
+	\end{table}
+}
+
+% \begin{code}[label]{caption} ... \end{code}
+\newsavebox{\CodeBox}
+\newenvironment{code}[2][]
+{
+	\VerbatimEnvironment
+	\def\lab{#1}
+	\def\cap{#2}
+	\begin{figure}[p]
+		\begin{center}
+			\begin{lrbox}{\CodeBox}
+				\begin{BVerbatim}
+}
+{
+				\end{BVerbatim}
+			\end{lrbox}
+			\framebox[15cm][l]{\usebox{\CodeBox}}
+			\caption{\cap}
+			\label{\lab}
+		\end{center}
+	\end{figure}
+}
+
+\author{$author.name$}
+\idnumber{$author.student_id$}
+\deadline{$date.year$}{$date.month$}{$date.date$}
+%% 長いタイトルで途中改行する場合，改行したい位置で
+%% \coverbreak, \abstbreak, \\ のいずれかを使う．
+%%   \coverbreak ：表紙でのみこの位置で改行
+%%    \abstbreak ：概要でのみこの位置で改行
+%%            \\ ：表紙・概要ともにこの位置で改行
+\title{$title$}
+\advisor{$if(advisor.prof)$1$endif$}{$advisor.name$} % 指導教員（1:教授，2:准教授）
+$if(secondadvisor)$
+\secondadvisor{$if(secondadvisor.prof)$1$endif$$if(secondadvisor.assistant_prof)$4$endif$}{$secondadvisor.name$} % （必要ならば）指導教員（1:教授，2:准教授，4:助教）
+$endif$
+%\thirdadvisor{4}{情報　三郎} % （必要ならば）指導教員（1:教授，2:准教授，4:助教）
+\begin{document}
+\maketitle
+
+%%
+%% 和文概要
+%%
+\begin{abstract}
+$abstract$
+\end{abstract}
+
+\begin{contents}
+\tableofcontents % 目次の作成
+%%\nchapter{記号説明} % 必要ならば
+%% ここに記号説明を書く
+\end{contents}
+
+%% 本文
+$body$
+
+% 謝辞
+\acknowledgement
+$acknowledgements$
+
+% 参考文献
+\bibliographystyle{kit-is} % 文献スタイルファイル
+\bibliography{bibliography} % 文献データベース
+
+% 付録
+% \appendix
+
+\end{document}
+

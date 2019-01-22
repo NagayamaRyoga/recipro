@@ -3,22 +3,30 @@
   "version": "1.0.0",
   "description": "論文ボイラープレート",
   "scripts": {
-    "test": "npm run lint src/**/*.md",
-    "lint": "textlint"
+    "lint": "textlint `(git diff --name-only '*.md'; git diff --staged --name-only '*.md'; git ls-files --others --exclude-standard '*.md') | sort | uniq`",
+    "lint:all": "textlint *.md",
+    "test": "npm run lint:all"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com.lab:NagayamaRyoga/recipro.git"
+    "url": "git@github.com:NagayamaRyoga/recipro.git"
   },
   "keywords": [
     "paper"
   ],
   "author": "NagayamaRyoga",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {},
   "devDependencies": {
     "@textlint-ja/textlint-rule-no-insert-dropping-sa": "^1.0.1",
     "@textlint-rule/textlint-rule-no-invalid-control-character": "^1.1.1",
-    "textlint": "^11.0.0",
+    "husky": "^1.3.1",
+    "textlint": "^11.2.1",
     "textlint-filter-rule-comments": "^1.2.2",
     "textlint-rule-ja-hiragana-fukushi": "^1.0.3",
     "textlint-rule-ja-hiragana-hojodoushi": "^1.0.4",
@@ -39,6 +47,8 @@
     "textlint-rule-no-exclamation-question-mark": "^1.0.2",
     "textlint-rule-no-hankaku-kana": "^1.0.2",
     "textlint-rule-no-mix-dearu-desumasu": "^3.0.3",
-    "textlint-rule-no-nfd": "^1.0.1"
+    "textlint-rule-no-nfd": "^1.0.1",
+    "textlint-rule-preset-jtf-style": "^2.3.2",
+    "textlint-rule-prh": "^5.2.0"
   }
 }

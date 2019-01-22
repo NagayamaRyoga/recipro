@@ -1,0 +1,77 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: paperist/alpine-texlive-ja
+    working_directory: /workspace
+    steps:
+      - checkout
+      - run:
+          name: Install
+          command: |
+            apk add --no-cache --virtual .depends curl gmp make
+            wget -O - 'https://github.com/jgm/pandoc/releases/download/2.5/pandoc-2.5-linux.tar.gz' | tar zxvf -
+            wget -O - 'https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.4.0/linux-ghc86-pandoc24.tar.gz' | tar zxvf -
+            mv pandoc-2.5/bin/pandoc pandoc-crossref /usr/local/bin/
+            rm -rf pandoc-2.5 pandoc-crossref.1
+      - run:
+          name: Build
+          command: |
+            make
+      - store_artifacts:
+          path: document.pdf
+      - persist_to_workspace:
+          root: .
+          paths:
+            - document.pdf
+
+  test:
+    docker:
+      - image: node:11-alpine
+    working_directory: /workspace
+    steps:
+      - run: apk add --no-cache ca-certificates
+      - checkout
+      - restore_cache:
+          keys:
+            - node-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            - node-cache-v1-{{ arch }}-{{ .Branch }}-
+            - node-cache-v1-
+            - node-cache-
+      - run:
+          command: |
+            npm install
+            npm test
+      - save_cache:
+          key: node-cache-v1-{{ arch }}-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+
+  deploy:
+    docker:
+      - image: alpine:3.8
+    working_directory: /workspace
+    steps:
+      - run: apk add --no-cache ca-certificates curl libc6-compat
+      - attach_workspace:
+          at: .
+      - run:
+          command: |
+            curl -Lo ./slackcat 'https://github.com/bcicen/slackcat/releases/download/v1.5/slackcat-1.5-linux-amd64'
+            chmod +x ./slackcat
+            echo "${SLACK_TOKEN}" > ~/.slackcat
+            ./slackcat --channel "${SLACK_CHANNEL}" document.pdf
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+      - test
+      - deploy:
+          requires:
+            - build
+            - test
+          filters:
+            branches:
+              only: master
