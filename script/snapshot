@@ -1,0 +1,5 @@
+#!/bin/sh
+SNAPFILE=`date +"snapshot/%Y/%m/%d/nagayama2019.tex"`
+
+mkdir -p `dirname ${SNAPFILE}`
+cp obj/nagayama2019.tex $SNAPFILE

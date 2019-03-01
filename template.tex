@@ -1,28 +1,31 @@
 \documentclass[a4j,12pt,twoside]{jreport}
-\usepackage{graphicx}
-\usepackage{csvsimple}
-\usepackage{fancyvrb}
+\usepackage[dvipdfmx]{graphicx}
 \usepackage[dvipdfmx]{hyperref}
+\usepackage{framed}
 \usepackage{kit-is-b}
 
-% \csvtable{caption}{label}{filepath}
-\makeatletter
-\csvset{
-	csv_table/.style={
-		after head=\csv@pretable \begin{tabular}{|*{\csv@columncount}{c|}} \csv@tablehead,
-		table head=\hline \csvlinetotablerow \\ \hline \hline,
-		late after line=\\,
-		late after last line=\csv@tablefoot \end{tabular} \csv@posttable,
-	}
+% \figureimage{caption}{label}{filepath}
+\newcommand{\figureimage}[3]{
+	\begin{figure}[p]
+		\begin{center}
+			\includegraphics[width=0.6\linewidth]{#3}
+			\caption{#1}
+			\label{#2}
+		\end{center}
+	\end{figure}
 }
-\makeatother
 
-\newcommand{\csvtable}[3]{
+% \loadtable{caption}{label}{style}{filepath}
+\newcommand{\loadtable}[4]{
 	\begin{table}[p]
 		\begin{center}
 			\caption{#1}
 			\label{#2}
-			\csvautotabular[csv_table]{#3}
+			\footnotesize
+			\begin{tabular}{#3}
+				\hline
+				\input{obj/#4}
+			\end{tabular}
 		\end{center}
 	\end{table}
 }
@@ -31,23 +34,24 @@
 \newsavebox{\CodeBox}
 \newenvironment{code}[2][]
 {
-	\VerbatimEnvironment
 	\def\lab{#1}
 	\def\cap{#2}
 	\begin{figure}[p]
 		\begin{center}
-			\begin{lrbox}{\CodeBox}
-				\begin{BVerbatim}
+			\footnotesize
+			\begin{framed}
 }
 {
-				\end{BVerbatim}
-			\end{lrbox}
-			\framebox[15cm][l]{\usebox{\CodeBox}}
+			\end{framed}
+			\normalsize
 			\caption{\cap}
 			\label{\lab}
 		\end{center}
 	\end{figure}
 }
+
+% \floor{expr}
+\newcommand{\floor}[1]{ \left\lfloor #1 \right\rfloor }
 
 \author{$author.name$}
 \idnumber{$author.student_id$}

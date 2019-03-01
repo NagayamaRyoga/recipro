@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ $# != 1 ]; then
+	echo "$0 <snapshot>"
+	exit 1
+fi
+
+latexdiff -e utf8 -t CFONT "snapshot/$1/nagayama2019.tex" obj/nagayama2019.tex 1> obj/nagayama2019-diff.tex 2> /dev/null &&
+ptex2pdf -l -ot "--kanji=utf8 --synctex=1 --interaction=batchmode" -output-directory obj obj/nagayama2019-diff.tex &&
+pbibtex --kanji=utf8 obj/nagayama2019-diff &&
+ptex2pdf -l -ot "--kanji=utf8 --synctex=1 --interaction=batchmode" -output-directory obj obj/nagayama2019-diff.tex &&
+ptex2pdf -l -ot "--kanji=utf8 --synctex=1 --interaction=batchmode" -output-directory obj obj/nagayama2019-diff.tex

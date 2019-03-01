@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ $# != 1 ]; then
+	echo "$0 <delim>"
+	exit 1
+fi
+
+sed -e '
+	s/$/ \\\\/g
+	1s/$/ \\hline \\hline/
+	s/'"$1"'/ \& /g
+	'
+
+echo '\hline'

@@ -11,7 +11,11 @@
     "ja-no-redundant-expression": true,
     "ja-no-successive-word": true,
     "ja-no-weak-phrase": true,
-    "ja-unnatural-alphabet": true,
+    "ja-unnatural-alphabet": {
+      "allow": [
+        "t検定"
+      ]
+    },
     "max-comma": true,
     "max-ten": true,
     "no-double-negative-ja": true,
@@ -19,7 +23,6 @@
     "no-doubled-conjunctive-particle-ga": true,
     "no-doubled-joshi": true,
     "no-dropping-the-ra": true,
-    "no-exclamation-question-mark": true,
     "no-hankaku-kana": true,
     "no-mix-dearu-desumasu": true,
     "no-nfd": true,

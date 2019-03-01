@@ -2,9 +2,7 @@
 
 本文。
 
-<!-- textlint-disable ja-no-mixed-period -->
-\csvtable{表}{tbl:sample}{assets/tbl/sample.csv}
-<!-- textlint-enable ja-no-mixed-period -->
+![表#tbl:sample{|c|r|}](assets/tbl/sample.csv)
 
 [@tbl:sample]は表の埋め込み例。
 
